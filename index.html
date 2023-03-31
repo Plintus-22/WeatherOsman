@@ -1,0 +1,84 @@
+<!DOCTYPE html> 
+<html lang='ru'> 
+<head> 
+    <meta charset='utf-8'> 
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css"/>
+</head> 
+<body> 
+    <div id="main">
+        <div class="blockkk">
+            <form name="myForm">
+                <span class="custom-dropdown big">
+                    <select name="cityes">    
+                        <option value="Almaty">Almaty</option>
+                        <option value="Astana">Astana</option>
+                        <option value="Moskow">Moskow</option>
+                        <option value="New york">New york</option>
+                        <option value="Istanbul">Istanbul</option>
+                        <option value="London">London</option>
+                        <option value="Paris">Paris</option>
+                        <option value="Berlin">Berlin</option>
+                    </select>
+                </span>
+            </form>
+            
+            <button onclick="getCord()" class="custom-btn btn-1">Выбрать</button>
+        </div>
+        <p id="date"></p>
+        <div id="values">
+            <center>
+                <h3 class="TextCity">Город: </h3>
+                <p id="city"></p>
+            </center>
+            <img id="image" src="" alt="">
+            <h1 id="weather"></h1>
+            <p id="temp"></p>
+            <img id="ptr" src="pointer.jpg" alt="">
+            <h3>Скорость ветра: </h3>
+            <p id="speed"></p>
+            <h3>Направление ветра: </h3>
+            <p id="map"></p>
+        </div>
+    </div>
+    <script>
+        Data = new Date();
+        document.getElementById("date").innerText = Data.getDate();
+        document.getElementById("date").innerText += ". " + Data.getMonth(); 
+        document.getElementById("date").innerText += ". " + Data.getFullYear();
+
+        
+        var lat = 0, lon = 0;
+        var city = myForm.cityes;
+        function getCord(){
+            
+            const xhr1 = new XMLHttpRequest();
+            xhr1.open("GET", "http://api.openweathermap.org/geo/1.0/direct?q=" + city.value + "&limit=1&appid=27c8fa702b7a1c80643b44219de81f73");
+            xhr1.onload = () =>{
+                var response1 = JSON.parse(xhr1.response);
+                lat = response1[0].lat;
+                lon = response1[0].lon;
+            getValues();
+            }
+            xhr1.send();
+        }
+        function getValues(){
+            const xhr = new XMLHttpRequest();
+            xhr.open("Get", "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=27c8fa702b7a1c80643b44219de81f73&lang=ru");
+            xhr.onload = () => {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+                document.getElementById("city").innerText = city.value;
+                document.getElementById("weather").innerText = response.weather[0].description;
+                document.getElementById("temp").innerText = Math.round(response.main.temp - 273) + "  °C";
+                document.querySelector("#image").src = response.weather[0].icon + ".png";
+                document.getElementById("speed").innerText = response.wind.speed + " m/c"
+                document.getElementById("map").innerText = response.wind.deg + " °"    
+                document.querySelector("#ptr").style.transform = "rotate(" + response.wind.deg + "deg)";
+            }
+            xhr.send();
+        }
+        
+    </script>
+</body> 
+</html>
